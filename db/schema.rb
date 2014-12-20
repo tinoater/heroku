@@ -11,10 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140707111715) do
+ActiveRecord::Schema.define(version: 20141220162219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "lcations", force: true do |t|
+    t.integer  "Lat"
+    t.integer  "Long"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "widgets", force: true do |t|
     t.string   "name"
@@ -22,6 +29,8 @@ ActiveRecord::Schema.define(version: 20140707111715) do
     t.integer  "stock"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "lat"
+    t.integer  "long"
   end
 
 end

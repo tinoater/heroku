@@ -6,6 +6,8 @@
       <th>Name</th>
       <th>Description</th>
       <th>Stock</th>
+      <th>Lat</th>
+      <th>Long</th>
       <th colspan="3"></th>
     </tr>
   </thead>
@@ -16,6 +18,8 @@
         <td><%= widget.name %></td>
         <td><%= widget.description %></td>
         <td><%= widget.stock %></td>
+        <td><%= widget.lat %></td>
+        <td><%= widget.long %></td>
         <td><%= link_to 'Show', widget %></td>
         <td><%= link_to 'Edit', edit_widget_path(widget) %></td>
         <td><%= link_to 'Destroy', widget, method: :delete, data: { confirm: 'Are you sure?' } %></td>
