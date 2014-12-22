@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141220162219) do
+ActiveRecord::Schema.define(version: 20141221193955) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,11 +26,11 @@ ActiveRecord::Schema.define(version: 20141220162219) do
   create_table "widgets", force: true do |t|
     t.string   "name"
     t.text     "description"
-    t.integer  "stock"
+    t.integer  "stock",       limit: 8
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "lat"
-    t.integer  "long"
+    t.float    "lat"
+    t.float    "long"
   end
 
 end

@@ -14,3 +14,11 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+
+$.ajaxSetup({
+  beforeSend: function(xhr){
+    var token = $('meta[name="csrf-token"]').attr('content');
+    xhr.setRequestHeader('Accept', 'text/javascript');
+    xhr.setRequestHeader('X-CSRF-Token', token);
+  }
+});
