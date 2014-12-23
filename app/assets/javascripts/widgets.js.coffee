@@ -30,24 +30,19 @@ $ ->
     execQueue(queue)
 
   execQueue = (array) ->
-    if array.length == 0
-      ajaxSuccess(deleteBtn)
-      return
-    deleteAjax(array.shift(),array)
+    console.log array
+    unless array.length == 0
+      deleteAjax(array.shift(),array)
+    ajaxSuccess(deleteBtn)
+    return
 
   deleteAjax = (i,array) ->
+    console.log "delete ajax"
     $.ajax({
-      url: "/widgets/#{i}",
-      type: "DELETE",
-      datatype: 'json',
-      }).success(execQueue(array))
-      .fail(fail)
-
-  deleteSuccess = (i,length) ->
-    deleteArray.push("i")
-    if deleteArray.length = length
-      console.log 'all' + deleteArray
-      ajaxSuccess(deleteBtn)
+      url: "/widgets/#{i}.json",
+      type: "DELETE"
+    }).success(execQueue(array))
+    .fail(fail)
 
   test = (element) ->
     loadingToggle(element)
@@ -58,8 +53,8 @@ $ ->
       url: "/widgets.json",
       type: "GET",
       datatype: 'json',
-      }).success(compSuccess)
-      .fail(fail)
+    }).success(compSuccess)
+    .fail(fail)
 
   compSuccess = (widgetData) ->
     loadingToggle(compBtn)
@@ -84,8 +79,8 @@ $ ->
       type: "POST",
       datatype: 'json',
       data: data
-      }).success(ajaxSuccess(ajaxBtn))
-      .fail(fail)
+    }).success(ajaxSuccess(ajaxBtn))
+    .fail(fail)
 
   success = (position) ->
     data.widget.stock = position.timestamp
@@ -97,8 +92,10 @@ $ ->
     console.log error
 
   ajaxSuccess = (element) ->
-    loadingToggle(element)
-    location.reload()
+    setTimeout(() ->
+      loadingToggle(element)
+      location.reload()
+    , 500)  ## Stops race contitions (not ideal)
 
   fail = () ->
     console.log event.currentTarget.response
