@@ -4,6 +4,7 @@
 
 
 $ ->
+  ajaxBtn = $('.ajax')
   data = { "widget": { "name": "MyString", "description": "MyText", "stock": "1", "lat": "1", "long": "1" } }
   geo_options = {
     enableHighAccuracy: true,
@@ -15,7 +16,11 @@ $ ->
     $('.ajax').on 'click', logic
 
   logic = () ->
+    ajaxToggle()
     navigator.geolocation.getCurrentPosition(success, error, geo_options)
+
+  ajaxToggle = () ->
+    ajaxBtn.toggleClass('loading')
 
   refreshPage = () ->
     location.reload()
@@ -39,6 +44,7 @@ $ ->
     console.log "error"
 
   ajaxSuccess = () ->
+    ajaxToggle()
     location.reload()
 
   fail = () ->

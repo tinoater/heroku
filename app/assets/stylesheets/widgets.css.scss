@@ -14,4 +14,21 @@
   cursor: pointer;
   width: 230px;
   text-align: center;
+  position: relative;
+}
+
+.ajax.loading {
+  color: rgb(123,173,13);
+}
+
+.ajax.loading:before {
+  content: '';
+  background-image: image-url('loading.gif');
+  position: absolute;
+  top: 50%;
+  margin-top: -150px;
+  margin-left: -155px;
+  left: 50%;
+  height: 310px;
+  width: 310px;
 }
