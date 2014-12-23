@@ -2,10 +2,13 @@
 # All this logic will automatically be available in application.js.
 # You can use CoffeeScript in this file: http://coffeescript.org/\
 
-
 $ ->
-  ajaxBtn = $('.ajax')
-  data = { "widget": { "name": "MyString", "description": "MyText", "stock": "1", "lat": "1", "long": "1" } }
+  deleteArray = []
+  ajaxBtn     = $('.ajax')
+  compBtn     = $('.comp')
+  deleteBtn   = $('.delete')
+  list        = $('tbody')
+  data        = { "widget": { "name": "MyString","description": "MyText", "stock": "1", "lat": "1", "long": "1" } }
   geo_options = {
     enableHighAccuracy: true,
     maximumAge : 30000,
@@ -13,17 +16,67 @@ $ ->
    }
 
   init = () ->
-    $('.ajax').on 'click', logic
+    ajaxBtn.on 'click', () -> logic(ajaxBtn)
+    compBtn.on 'click', () -> test(compBtn)
+    deleteBtn.on 'click', () -> deleteAll(deleteBtn)
 
-  logic = () ->
-    ajaxToggle()
+  deleteAll = (element) ->
+    queue = []
+    loadingToggle(element)
+    length = list.children().length
+    for i in [0..(length - 1)]
+      id = parseInt($(list.children()[i]).children()[0].innerHTML)
+      queue.push(id)
+    execQueue(queue)
+
+  execQueue = (array) ->
+    if array.length == 0
+      ajaxSuccess(deleteBtn)
+      return
+    deleteAjax(array.shift(),array)
+
+  deleteAjax = (i,array) ->
+    $.ajax({
+      url: "/widgets/#{i}",
+      type: "DELETE",
+      datatype: 'json',
+      }).success(execQueue(array))
+      .fail(fail)
+
+  deleteSuccess = (i,length) ->
+    deleteArray.push("i")
+    if deleteArray.length = length
+      console.log 'all' + deleteArray
+      ajaxSuccess(deleteBtn)
+
+  test = (element) ->
+    loadingToggle(element)
+    getLatest()
+
+  getLatest = () ->
+    $.ajax({
+      url: "/widgets.json",
+      type: "GET",
+      datatype: 'json',
+      }).success(compSuccess)
+      .fail(fail)
+
+  compSuccess = (widgetData) ->
+    loadingToggle(compBtn)
+    lastUpdate = widgetData[widgetData.length - 1]
+    lat  = lastUpdate.lat
+    long = lastUpdate.long
+    if Math.round(lat) + Math.round(long) == 45
+      alert "You're a winner"
+      return
+    alert 'you loose'
+
+  logic = (element) ->
+    loadingToggle(element)
     navigator.geolocation.getCurrentPosition(success, error, geo_options)
 
-  ajaxToggle = () ->
-    ajaxBtn.toggleClass('loading')
-
-  refreshPage = () ->
-    location.reload()
+  loadingToggle = (element) ->
+    element.toggleClass('loading')
 
   next = () ->
     $.ajax({
@@ -31,7 +84,7 @@ $ ->
       type: "POST",
       datatype: 'json',
       data: data
-      }).success(ajaxSuccess)
+      }).success(ajaxSuccess(ajaxBtn))
       .fail(fail)
 
   success = (position) ->
@@ -40,11 +93,11 @@ $ ->
     data.widget.long  = position.coords.longitude
     next()
 
-  error = () ->
-    console.log "error"
+  error = (error) ->
+    console.log error
 
-  ajaxSuccess = () ->
-    ajaxToggle()
+  ajaxSuccess = (element) ->
+    loadingToggle(element)
     location.reload()
 
   fail = () ->

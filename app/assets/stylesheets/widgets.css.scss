@@ -3,7 +3,9 @@
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
 
-.ajax {
+.ajax,
+.comp,
+.delete {
   padding: 1.5em;
   background: rgb(123,173,13);
   border: 2px solid rgb(110,160,0);
@@ -21,7 +23,9 @@
   color: rgb(123,173,13);
 }
 
-.ajax.loading:before {
+.ajax.loading:before,
+.comp.loading:before,
+.delete.loading:before {
   content: '';
   background-image: image-url('loading.gif');
   position: absolute;
@@ -31,4 +35,22 @@
   left: 50%;
   height: 310px;
   width: 310px;
+}
+
+.comp {
+  background: orange;
+  border: 2px solid orange;
+}
+
+.comp.loading {
+  color: orange;
+}
+
+.delete {
+  background: red;
+  border: 2px solid red;
+}
+
+.delete.loading {
+  color: red;
 }
