@@ -8,7 +8,7 @@ $ ->
   compBtn     = $('.comp')
   deleteBtn   = $('.delete')
   list        = $('tbody')
-  data        = { "widget": { "name": "MyString","description": "MyText", "stock": "1", "lat": "1", "long": "1" } }
+  data        = { "widget": { "name": "MyString", "description": "MyText", "stock": "1", "lat": "1", "long": "1" } }
   geo_options = {
     enableHighAccuracy: true,
     maximumAge : 30000,
@@ -16,13 +16,44 @@ $ ->
    }
 
   init = () ->
-    ajaxBtn.on 'click', () -> logic(ajaxBtn)
-    compBtn.on 'click', () -> test(compBtn)
-    deleteBtn.on 'click', () -> deleteAll(deleteBtn)
+    ajaxBtn.on    'click', getLocation
+    compBtn.on    'click', () -> test(compBtn)
+    deleteBtn.on  'click', () -> deleteAll(deleteBtn)
+
+  ajax = (url,type,data=0,success) ->
+    ajaxObject = {
+      url: url,
+      type: type,
+      datatype: 'json'
+    }
+    if data != 0
+      ajaxObject['data'] = data
+    $.ajax(ajaxObject)
+      .success(success)
+      .fail(fail)
+
+  getLocation = () ->
+    loadingToggle(ajaxBtn)
+    navigator.geolocation.getCurrentPosition(getSuccess, error, geo_options)
+
+  loadingToggle = (element) ->
+    element.toggleClass('loading')
+
+  getSuccess = (position) ->
+    data.widget.stock = position.timestamp
+    data.widget.lat   = position.coords.latitude
+    data.widget.long  = position.coords.longitude
+    ajax("/widgets.json","POST",data,appGetSuccess(ajaxBtn))
+
+  appGetSuccess = (element) ->
+    setTimeout(() ->
+      loadingToggle(element)
+      location.reload()
+    , 500)  ## Stops race contitions (not ideal)
 
   deleteAll = (element) ->
-    queue = []
     loadingToggle(element)
+    queue  = []
     length = list.children().length
     for i in [0..(length - 1)]
       id = parseInt($(list.children()[i]).children()[0].innerHTML)
@@ -30,75 +61,30 @@ $ ->
     execQueue(queue)
 
   execQueue = (array) ->
-    console.log array
     unless array.length == 0
-      deleteAjax(array.shift(),array)
-    ajaxSuccess(deleteBtn)
+      ajax("/widgets/#{array.shift()}.json","DELETE",execQueue(array))
+    appGetSuccess(deleteBtn)
     return
-
-  deleteAjax = (i,array) ->
-    console.log "delete ajax"
-    $.ajax({
-      url: "/widgets/#{i}.json",
-      type: "DELETE"
-    }).success(execQueue(array))
-    .fail(fail)
 
   test = (element) ->
     loadingToggle(element)
-    getLatest()
-
-  getLatest = () ->
-    $.ajax({
-      url: "/widgets.json",
-      type: "GET",
-      datatype: 'json',
-    }).success(compSuccess)
-    .fail(fail)
+    ajax("/widgets/json","GET",compSuccess)
 
   compSuccess = (widgetData) ->
-    loadingToggle(compBtn)
     lastUpdate = widgetData[widgetData.length - 1]
-    lat  = lastUpdate.lat
-    long = lastUpdate.long
+    lat        = lastUpdate.lat
+    long       = lastUpdate.long
+    loadingToggle(compBtn)
     if Math.round(lat) + Math.round(long) == 45
       alert "You're a winner"
       return
     alert 'you loose'
 
-  logic = (element) ->
-    loadingToggle(element)
-    navigator.geolocation.getCurrentPosition(success, error, geo_options)
-
-  loadingToggle = (element) ->
-    element.toggleClass('loading')
-
-  next = () ->
-    $.ajax({
-      url: "/widgets.json",
-      type: "POST",
-      datatype: 'json',
-      data: data
-    }).success(ajaxSuccess(ajaxBtn))
-    .fail(fail)
-
-  success = (position) ->
-    data.widget.stock = position.timestamp
-    data.widget.lat   = position.coords.latitude
-    data.widget.long  = position.coords.longitude
-    next()
+  fail = () ->
+    console.log event.currentTarget.response
 
   error = (error) ->
     console.log error
-
-  ajaxSuccess = (element) ->
-    setTimeout(() ->
-      loadingToggle(element)
-      location.reload()
-    , 500)  ## Stops race contitions (not ideal)
-
-  fail = () ->
-    console.log event.currentTarget.response
 
   init()
 
